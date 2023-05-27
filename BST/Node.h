@@ -8,21 +8,133 @@
 	public:
 		Node();
 		Node(T value);
+		Node(T value, Node<T>* p, Node<T>* l, Node<T>* r);
 		~Node();
-		
-		void Add(T value);
+
+		Node<T>* Add(T value);
 		Node<T>* Remove(T value, Node<T>* rt);
 		bool Contains(T value);
-		void Clear(Node<T>* rt);
+		void Clear(Node<T>*& rt);
 
 		Node<T>* GetLeft(Node<T>* n);
 		Node<T>* GetRight(Node<T>* n);
-		
+
 		int Count();
 		int Height();
-		
+
 		T* ToArray();
 		void ArrayBuilder(T* array, int index);
+
+		//rotations
+		Node<T>* leftRot()
+		{
+			Node<T>* nr = this->right;
+			if (nr)
+			{	
+				Node<T>* move = nr->left;
+				nr->left = this;
+				nr->parent = this->parent;
+				this->parent = nr;
+				this->right = move;
+				if (move) {
+					move->parent = this;
+				}
+			
+				return nr;
+			}
+			else {
+				return this;
+			}
+			//this->right = nr->left;
+			//nr->left = this;
+			//return nr;
+
+		}
+		Node<T>* rightRot()
+		{
+			Node<T>* nr = this->left;
+			if (nr)
+			{
+				Node<T>* move = nr->right;
+				nr->right = this;
+				nr->parent = this->parent;
+				this->parent = nr;
+				this->left = move;
+				if (move) {
+					move->parent = this;
+				}
+				return nr;
+			}
+			else {
+				return this;
+			}
+			//this->left = nr->right;
+			//nr->right = this;
+			//return nr;
+		}
+
+		Node<T>* Balance()
+		{
+			//key 
+			//>1 is right heavy
+			//<-1 is left heavy
+			//0,1,-1 is balanced
+			//I probably could refactor given I dont need all the "this" but whatever
+
+			//nullptrs might be causing rotation problemos
+			
+				
+
+			Node<T>* nr = this;
+
+		if (this->balanceFactor() > 1)
+		{
+			if (this->right->balanceFactor() < 0)
+			{
+				//heres the winner
+				right = right->rightRot();
+			}
+			
+			nr = leftRot();
+		}
+
+		else if (this->balanceFactor() < -1)
+		{
+			// OH! I JUST REALIZED WHAT WAS WRONG
+			//making a balance factor method immediately oh my goodness oh my goodness
+			if (this->left->balanceFactor() > 0)
+			{
+				//too many thissssssss
+				left = left->leftRot();
+			}
+			nr = rightRot();
+		}
+		
+
+			return nr;
+		
+	}
+	
+		int balanceFactor()
+		{
+			if (this->left && this->right)
+			{
+				return this->right->Height() - this->left->Height();
+
+			}
+			else if (!this->left && this->right)
+			{
+				return this->right->Height();
+			}
+			else if (this->left && !this->right)
+			{
+				return -this->left->Height();
+			}
+			else
+			{
+				return 0;
+			}
+		}
 		
 		bool DirectionChecker();
 		
@@ -36,6 +148,7 @@
 		Node* left;
 		Node* right;
 		Node* parent;
+		//int balanceFactor = 0;
 	};
 
 	template<typename T>
@@ -57,30 +170,45 @@
 		this->left = nullptr;
 		this->right = nullptr;
 	}
+	template<typename T>
+	inline Node<T>::Node(T value, Node<T>* p, Node<T>* l, Node<T>* r)
+	{
+		this->value = value;
+		this->parent = p;
+		this->left = l;
+		this->right = r;
+	}
 
 	template<typename T>
 	inline Node<T>::~Node()
 	{
-		this->Clear();
-		//delete this;
+		//empty
+		this->value = NULL;
+		this->left = nullptr;
+		this->right = nullptr;
+		this->parent = nullptr;
+		
 		
 	}
 
 	template<typename T>
-	inline void Node<T>::Add(T value)
+	inline Node<T>* Node<T>::Add(T value)
 	{
-		if (this->value) {
-			if (value != this->value) {
+		if (value != this->value) {
+			if (this->value) {
+
 				if (value < this->value)
 				{
 					if (this->left == nullptr)
 					{
 						this->left = new Node(value);
 						this->left->parent = this;
+
 					}
 					else
 					{
-						this->left->Add(value);
+						this->left = this->left->Add(value);
+
 					}
 				}
 				else
@@ -89,20 +217,26 @@
 					{
 						this->right = new Node(value);
 						this->right->parent = this;
+
 					}
 					else
 					{
-						this->right->Add(value);
+						this->right = this->right->Add(value);
+
 					}
 				}
+
 			}
-			else {
-				return;
+			else
+			{
+				this->value = value;
+
 			}
+
+			return this->Balance();
 		}
-		else
-		{
-			this->value = value;
+		else {
+			return this;
 		}
 	}
 	
@@ -161,11 +295,13 @@
 				{
 					if (rt->left == nullptr)
 					{
+						this->Balance();
 						return rt->right;
 
 					}
 					else if (rt->right == nullptr)
 					{
+						this->Balance();
 						return rt->left;
 					}
 
@@ -175,10 +311,13 @@
 
 
 				}
+				this->Balance();
 				return rt;
 			}
 		}
-		else { return rt; }
+		else { 
+			this->Balance();
+			return rt; }
 		}
 		
 		//Node* nodeToRemove = nullptr;
@@ -301,19 +440,19 @@
 	}
 
 	template<typename T>
-	inline void Node<T>::Clear(Node<T>* n)
+	inline void Node<T>::Clear(Node<T>*& n)
 	{
 		if (n==nullptr) {
 			return;
 		}
 		// recursive black magic ig lol
-		if (n.left != nullptr)
+		if (n->left != nullptr)
 		{
-			Clear(n.left);
+			Clear(n->left);
 		}
-		if (n.right != nullptr)
+		if (n->right != nullptr)
 		{
-			Clear(n.right);
+			Clear(n->right);
 		}
 		
 		delete n;
@@ -341,24 +480,18 @@
 	{
 		if (this)
 		{
-			int leftHeight = 0;
-			int rightHeight = 0;
-			if (this->left)
-			{
-				leftHeight = this->left->Height();
-			}
-			if (this->right)
-			{
-				rightHeight = this->right->Height();
-			}
-			if (leftHeight > rightHeight)
-			{
-				return leftHeight + 1;
-			}
-			else
-			{
-				return rightHeight + 1;
-			}
+				//int l, r;
+				int l = (this->left != nullptr) ? this->left->Height(): 0;
+				int r = (this->right != nullptr) ? this->right->Height() : 0;
+				//std::cout << "Height calculation for value: " << this->value << " Left: " << l << " Right: " << r << std::endl;
+				if (l > r)
+				{
+					return 1 + l;
+				}
+				else
+				{
+					return 1 +r;
+				}
 		}
 		else
 		{
@@ -566,22 +699,15 @@
 	inline std::string Node<T>::PostOrder()
 	{
 		std::string out = "";
-		if (this) {
-			if (this->left)
-			{
-				out += this->left->PostOrder();
+		if (this != nullptr) {
+			if (this->left) {
+				out += this->left->PostOrder() + ", ";
 			}
-			if (this->right)
-			{
-				out += this->right->PostOrder();
+			
+			if (this->right) {
+				out += this->right->PostOrder() + ", ";
 			}
-			if (this->parent == nullptr)
-			{
-				out += std::to_string(this->value);
-			}
-			else {
-				out += std::to_string(this->value) + ", ";
-			}
+			out += std::to_string(this->value);
 		}
 		return out;
 	}

@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include "Node.h"
+#include "AVLNode.h"
 
 
 class BSTTests
@@ -165,8 +166,8 @@ public:
 		n->Clear(n);
 
 		std::cout << "Cleartest" << std::endl;
-		std::cout << n->PostOrder() << std::endl;
-		return n == NULL;
+		//std::cout << n->PostOrder() << std::endl;
+		return !n;
 
 	}
 
@@ -304,9 +305,9 @@ int main()
 	n->Add(35);
 	n->Add(30);
 	std::cout << n->PostOrder();*/
-	BSTTests* b = new BSTTests();
+	/*BSTTests* b = new BSTTests();*/
 	
-	if (b->AddTestBasic())
+	/*if (b->AddTestBasic())
 	{
 		std::cout << b->AddTestEmpty() << std::endl;
 		std::cout << b->AddTestDupe() << std::endl;
@@ -332,8 +333,77 @@ int main()
 	}
 	else {
 		std::cout << "I lose outright ;(";
-	}
+	}*/
 
+	Node<int>* n = new Node<int>(40);
+	n = n->Add(50);
+	//n->Visualizer();
+	std::cout << n->Height();
+	std::cout << std::endl;
+	std::cout << n->right->Height();
+	std::cout << std::endl;
+	//std::cout << n->right->value;
+	std::cout << std::endl;
+	
+	std::cout << n->PostOrder();
+	n=n->Add(45);
+	std::cout << std::endl;
+	
+//	n->Visualizer();
+	std::cout << std::endl;
+	std::cout << n->PostOrder();
+
+	//Node<int>* n2 = new Node<int>(45);
+	//n = n->Add(50);
+	//n = n->Add(40);
+	//std::cout << std::endl;
+	//std::cout << n->PostOrder();
+
+	Node<int>* n2 = new Node<int>(40);
+	n2 = n2->Add(30);
+	std::cout << std::endl;
+	std::cout << n2->PostOrder();
+	n2 = n2->Add(35);
+	std::cout << std::endl;
+	std::cout << n2->PostOrder();
+
+
+	Node<int>* n4 = new Node<int>(40);
+	n4 = n4->Add(50);
+	n4 = n4->Add(60);
+
+	Node<int>* n5 = new Node<int>(50);
+	n5 = n5->Add(40);
+	n5 = n5->Add(60);
+
+	std::string s = n4->PostOrder();
+	std::string t = n5->PostOrder();
+	std::cout << std::endl;
+	std::cout << s;
+	std::cout << std::endl;
+	std::cout << t;
+
+	Node<int>* n6 = new Node<int>(99);
+	n6 = n6->Add(150);
+	n6 = n6->Add(50);
+	n6 = n6->Add(75);
+	n6 = n6->Add(65);
+	//n6 = n6->Add(60);
+	std::cout << std::endl;
+	std::cout << n6->PostOrder();
+	std::cout << std::endl;
+	std::cout << std::endl;
+
+	Node<int>* n7 = new Node<int>((rand() % (300 - 1 + 1)) + 1);
+	for (int a = 0; a < 200; a++)
+	{
+		n7 = n7->Add((rand()% (300-1+1))+1);
+	}
+	n7->Visualizer();
+//	n6->Visualizer();
+	//Assert().AreEqual(t, s);
+	
+	//std::cout << n->balanceFactor;
 	//std::cout << 
 
 }
