@@ -1,0 +1,11 @@
+A,B,Z,X,Y,K,R,C,P
+Z,K
+Z,X
+X,Z,A,R
+R,X,P
+P,R
+A,X,B
+B,A,Y
+Y,B,C
+C,Y,K
+K,C
